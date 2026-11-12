@@ -32,3 +32,11 @@ def generar_contrasena(
     )
     secrets.SystemRandom().shuffle(caracteres)
     return "".join(caracteres)
+
+
+def calcular_fuerza(longitud: int, numeros: bool, simbolos: bool) -> str:
+    if longitud >= 16 and numeros and simbolos:
+        return "fuerte"
+    if longitud < 12 or not (numeros or simbolos):
+        return "débil"
+    return "media"

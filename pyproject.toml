@@ -1,0 +1,3 @@
+[tool.ruff.lint.per-file-ignores]
+# El contrato de pruebas no se puede modificar (ver AGENTS.md).
+"tests/test_aceptacion.py" = ["I001"]

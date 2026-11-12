@@ -2,7 +2,7 @@ from fastapi import FastAPI, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from app.servicios import generar_contrasena
+from app.servicios import calcular_fuerza, generar_contrasena
 
 app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
@@ -24,4 +24,5 @@ def obtener_contrasena(
     simbolos: bool = False,
 ) -> dict[str, str | int]:
     contrasena = generar_contrasena(longitud, numeros, simbolos)
-    return {"contrasena": contrasena, "longitud": longitud}
+    fuerza = calcular_fuerza(longitud, numeros, simbolos)
+    return {"contrasena": contrasena, "longitud": longitud, "fuerza": fuerza}

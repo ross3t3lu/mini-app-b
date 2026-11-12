@@ -4,136 +4,770 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Generador de contraseñas</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237c5cff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='11' width='16' height='10' rx='2.5'/><path d='M8 11V7a4 4 0 0 1 8 0v4'/></svg>">
     <style>
       :root {
+        --fondo: #f4f2ff;
+        --fondo-2: #e8f3ff;
+        --tarjeta: rgba(255, 255, 255, 0.78);
+        --borde: rgba(124, 92, 255, 0.16);
+        --texto: #1b1740;
+        --texto-suave: #635f86;
+        --acento: #7c5cff;
+        --acento-2: #2fb7ff;
+        --superficie: #f6f4ff;
+        --superficie-2: #ece8ff;
+        --pista: #ddd7fb;
+        --sombra: 0 30px 80px -30px rgba(76, 52, 190, 0.45);
+        --debil: #ef4f6b;
+        --media: #eab308;
+        --fuerte: #22a45d;
+        --mono: ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
         color-scheme: light;
-        font-family: system-ui, sans-serif;
-        color: #172033;
-        background: #f3f6fb;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --fondo: #0d0b1f;
+          --fondo-2: #071a2c;
+          --tarjeta: rgba(24, 20, 52, 0.78);
+          --borde: rgba(160, 140, 255, 0.18);
+          --texto: #f1efff;
+          --texto-suave: #a7a2cc;
+          --superficie: #1d1940;
+          --superficie-2: #27224f;
+          --pista: #332d63;
+          --sombra: 0 30px 80px -30px rgba(0, 0, 0, 0.8);
+          color-scheme: dark;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
       }
 
       body {
         display: grid;
         min-height: 100vh;
         margin: 0;
+        padding: 24px 16px;
         place-items: center;
+        background:
+          radial-gradient(circle at 15% 10%, rgba(124, 92, 255, 0.28), transparent 45%),
+          radial-gradient(circle at 85% 90%, rgba(47, 183, 255, 0.25), transparent 45%),
+          linear-gradient(160deg, var(--fondo), var(--fondo-2));
+        background-attachment: fixed;
+        color: var(--texto);
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        line-height: 1.5;
       }
 
       main {
-        width: min(90vw, 30rem);
-        padding: 2rem;
-        border-radius: 1rem;
-        background: white;
-        box-shadow: 0 1rem 2.5rem #1720331a;
+        width: min(100%, 34rem);
+        padding: clamp(1.4rem, 5vw, 2.4rem);
+        border: 1px solid var(--borde);
+        border-radius: 28px;
+        background: var(--tarjeta);
+        box-shadow: var(--sombra);
+        backdrop-filter: blur(18px);
+        animation: entrar 0.5s ease-out;
+      }
+
+      @keyframes entrar {
+        from {
+          opacity: 0;
+          transform: translateY(14px) scale(0.98);
+        }
+      }
+
+      .encabezado {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        margin-bottom: 1.6rem;
+      }
+
+      .logo {
+        display: grid;
+        width: 52px;
+        height: 52px;
+        flex-shrink: 0;
+        place-items: center;
+        border-radius: 16px;
+        background: linear-gradient(135deg, var(--acento), var(--acento-2));
+        box-shadow: 0 12px 24px -10px var(--acento);
+        color: white;
       }
 
       h1 {
-        margin-top: 0;
+        margin: 0;
+        font-size: clamp(1.35rem, 4.5vw, 1.65rem);
+        letter-spacing: -0.02em;
       }
 
-      form,
-      .resultado {
-        display: grid;
-        gap: 1rem;
+      .subtitulo {
+        margin: 0.1rem 0 0;
+        color: var(--texto-suave);
+        font-size: 0.93rem;
       }
 
-      .opcion {
+      /* Caja de la contraseña */
+      .caja {
+        position: relative;
+        padding: 1.1rem 1.1rem 1rem;
+        border: 1px solid var(--borde);
+        border-radius: 20px;
+        background: var(--superficie);
+      }
+
+      .fila-contrasena {
         display: flex;
         align-items: center;
         gap: 0.5rem;
       }
 
-      input[type="number"],
       #contrasena {
-        box-sizing: border-box;
-        width: 100%;
-        padding: 0.7rem;
-        border: 1px solid #b8c2d3;
-        border-radius: 0.4rem;
-        font: inherit;
+        flex: 1;
+        min-width: 0;
+        padding: 0.2rem 0;
+        border: 0;
+        background: transparent;
+        color: var(--texto);
+        font-family: var(--mono);
+        font-size: clamp(1.05rem, 4.2vw, 1.35rem);
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        outline: none;
+        text-overflow: ellipsis;
       }
 
-      button {
-        padding: 0.75rem 1rem;
+      #contrasena.animar {
+        animation: aparecer 0.35s ease-out;
+      }
+
+      @keyframes aparecer {
+        from {
+          opacity: 0;
+          filter: blur(6px);
+        }
+      }
+
+      .icono {
+        display: grid;
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        place-items: center;
         border: 0;
-        border-radius: 0.4rem;
-        background: #2457d6;
+        border-radius: 12px;
+        background: var(--superficie-2);
+        color: var(--texto-suave);
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s, transform 0.15s;
+      }
+
+      .icono:hover {
+        background: var(--acento);
         color: white;
-        font: inherit;
+      }
+
+      .icono:active {
+        transform: scale(0.92);
+      }
+
+      .icono.girar svg {
+        animation: girar 0.5s ease;
+      }
+
+      @keyframes girar {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Medidor de seguridad */
+      .medidor {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-top: 0.9rem;
+      }
+
+      .barras {
+        display: grid;
+        flex: 1;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+
+      .barras span {
+        height: 6px;
+        border-radius: 99px;
+        background: var(--pista);
+        transition: background 0.35s;
+      }
+
+      #nivel {
+        min-width: 6.5rem;
+        color: var(--texto-suave);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-align: right;
+        transition: color 0.35s;
+      }
+
+      /* Opciones */
+      form {
+        display: grid;
+        gap: 1.4rem;
+        margin-top: 1.6rem;
+      }
+
+      .titulo-opcion {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 0.6rem;
+        font-weight: 600;
+      }
+
+      .numero-longitud {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        color: var(--texto-suave);
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+
+      #longitud {
+        width: 4.2rem;
+        padding: 0.35rem 0.5rem;
+        border: 1px solid var(--borde);
+        border-radius: 10px;
+        background: var(--superficie);
+        color: var(--texto);
+        font: 600 1rem var(--mono);
+        text-align: center;
+      }
+
+      #longitud:focus-visible,
+      .interruptor input:focus-visible + .tarjeta-opcion,
+      button:focus-visible {
+        outline: 3px solid rgba(124, 92, 255, 0.45);
+        outline-offset: 2px;
+      }
+
+      #deslizador {
+        --progreso: 7%;
+        width: 100%;
+        height: 8px;
+        margin: 0.4rem 0;
+        border-radius: 99px;
+        background: linear-gradient(90deg, var(--acento), var(--acento-2)) 0 / var(--progreso) 100% no-repeat,
+          var(--pista);
+        appearance: none;
         cursor: pointer;
       }
 
-      #copiar {
-        background: #42516b;
+      #deslizador::-webkit-slider-thumb {
+        width: 24px;
+        height: 24px;
+        border: 4px solid white;
+        border-radius: 50%;
+        background: var(--acento);
+        box-shadow: 0 4px 12px rgba(76, 52, 190, 0.45);
+        appearance: none;
+        transition: transform 0.15s;
+      }
+
+      #deslizador::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+
+      #deslizador::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border: 4px solid white;
+        border-radius: 50%;
+        background: var(--acento);
+        box-shadow: 0 4px 12px rgba(76, 52, 190, 0.45);
+      }
+
+      .marcas {
+        display: flex;
+        justify-content: space-between;
+        color: var(--texto-suave);
+        font-size: 0.75rem;
+      }
+
+      .interruptores {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+        gap: 0.7rem;
+      }
+
+      .interruptor input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .tarjeta-opcion {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        height: 100%;
+        padding: 0.85rem 0.95rem;
+        border: 1.5px solid var(--borde);
+        border-radius: 16px;
+        background: var(--superficie);
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s;
+      }
+
+      .tarjeta-opcion:hover {
+        border-color: var(--acento);
+      }
+
+      .muestra {
+        display: grid;
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        place-items: center;
+        border-radius: 11px;
+        background: var(--superficie-2);
+        color: var(--acento);
+        font: 700 0.95rem var(--mono);
+      }
+
+      .texto-opcion {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .texto-opcion strong {
+        display: block;
+        font-size: 0.95rem;
+      }
+
+      .texto-opcion small {
+        color: var(--texto-suave);
+        font-family: var(--mono);
+        font-size: 0.75rem;
+      }
+
+      .palanca {
+        position: relative;
+        width: 40px;
+        height: 24px;
+        flex-shrink: 0;
+        border-radius: 99px;
+        background: var(--pista);
+        transition: background 0.25s;
+      }
+
+      .palanca::after {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: white;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+        content: "";
+        transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.6, 1);
+      }
+
+      .interruptor input:checked + .tarjeta-opcion {
+        border-color: var(--acento);
+        background: var(--superficie-2);
+      }
+
+      .interruptor input:checked + .tarjeta-opcion .palanca {
+        background: linear-gradient(90deg, var(--acento), var(--acento-2));
+      }
+
+      .interruptor input:checked + .tarjeta-opcion .palanca::after {
+        transform: translateX(16px);
+      }
+
+      .nota {
+        margin: -0.6rem 0 0;
+        color: var(--texto-suave);
+        font-size: 0.8rem;
+      }
+
+      /* Botones principales */
+      .acciones {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.7rem;
+      }
+
+      .boton {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        padding: 0.95rem 1.3rem;
+        border: 0;
+        border-radius: 16px;
+        font-family: inherit;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.2s, filter 0.2s;
+      }
+
+      .boton:active {
+        transform: scale(0.97);
+      }
+
+      .boton-primario {
+        background: linear-gradient(135deg, var(--acento), var(--acento-2));
+        box-shadow: 0 14px 28px -12px var(--acento);
+        color: white;
+      }
+
+      .boton-primario:hover {
+        box-shadow: 0 18px 34px -12px var(--acento);
+        filter: brightness(1.06);
+      }
+
+      .boton-primario[aria-busy="true"] {
+        filter: saturate(0.6);
+        pointer-events: none;
+      }
+
+      .boton-secundario {
+        border: 1.5px solid var(--borde);
+        background: var(--superficie);
+        color: var(--texto);
+      }
+
+      .boton-secundario:hover {
+        border-color: var(--acento);
+      }
+
+      .boton-secundario.copiado {
+        border-color: var(--fuerte);
+        background: var(--fuerte);
+        color: white;
       }
 
       #estado {
-        min-height: 1.5em;
+        min-height: 1.4em;
+        margin: 0;
+        font-size: 0.88rem;
+        text-align: center;
+      }
+
+      #estado.error {
+        color: var(--debil);
+      }
+
+      #estado.exito {
+        color: var(--fuerte);
+      }
+
+      footer {
+        margin-top: 1.2rem;
+        color: var(--texto-suave);
+        font-size: 0.78rem;
+        text-align: center;
+      }
+
+      @media (max-width: 420px) {
+        .acciones {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
       }
     </style>
   </head>
   <body>
     <main>
-      <h1>Generador de contraseñas</h1>
-      <form id="formulario">
-        <label for="longitud">Longitud (8–64)</label>
-        <input id="longitud" name="longitud" type="number" min="8" max="64" value="12" required>
-        <label class="opcion">
-          <input id="numeros" name="numeros" type="checkbox" checked>
-          Incluir números
-        </label>
-        <label class="opcion">
-          <input id="simbolos" name="simbolos" type="checkbox">
-          Incluir símbolos (!@#$%&amp;*?-_)
-        </label>
-        <button type="submit">Generar contraseña</button>
-      </form>
-      <section class="resultado" aria-live="polite">
-        <label for="contrasena">Contraseña generada</label>
-        <input id="contrasena" type="text" readonly>
-        <button id="copiar" type="button">Copiar contraseña</button>
-        <p id="estado" role="status"></p>
+      <header class="encabezado">
+        <div class="logo" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="11" width="16" height="10" rx="2.5"></rect>
+            <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+            <circle cx="12" cy="16" r="1.2" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <div>
+          <h1>Generador de contraseñas</h1>
+          <p class="subtitulo">Crea contraseñas seguras y aleatorias en un clic.</p>
+        </div>
+      </header>
+
+      <section class="caja" aria-live="polite">
+        <label for="contrasena" class="subtitulo">Tu contraseña</label>
+        <div class="fila-contrasena">
+          <input id="contrasena" type="text" readonly spellcheck="false" autocomplete="off" placeholder="••••••••••••">
+          <button id="ver" class="icono" type="button" aria-label="Ocultar contraseña" title="Mostrar u ocultar">
+            <svg id="icono-ver" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+          </button>
+          <button id="regenerar" class="icono" type="button" aria-label="Generar otra contraseña" title="Generar otra">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path>
+              <path d="M21 3v5h-5"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="medidor">
+          <div class="barras" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <span id="nivel">Fuerza: —</span>
+        </div>
       </section>
+
+      <form id="formulario" novalidate>
+        <div>
+          <div class="titulo-opcion">
+            <label for="deslizador">Longitud</label>
+            <span class="numero-longitud">
+              <input id="longitud" name="longitud" type="number" min="8" max="64" value="12" required aria-label="Longitud exacta">
+              caracteres
+            </span>
+          </div>
+          <input id="deslizador" type="range" min="8" max="64" value="12">
+          <div class="marcas" aria-hidden="true"><span>8</span><span>64</span></div>
+        </div>
+
+        <div class="interruptores">
+          <label class="interruptor">
+            <input id="numeros" name="numeros" type="checkbox" checked>
+            <span class="tarjeta-opcion">
+              <span class="muestra" aria-hidden="true">123</span>
+              <span class="texto-opcion">
+                <strong>Números</strong>
+                <small>0–9</small>
+              </span>
+              <span class="palanca" aria-hidden="true"></span>
+            </span>
+          </label>
+          <label class="interruptor">
+            <input id="simbolos" name="simbolos" type="checkbox">
+            <span class="tarjeta-opcion">
+              <span class="muestra" aria-hidden="true">#$&amp;</span>
+              <span class="texto-opcion">
+                <strong>Símbolos</strong>
+                <small>!@#$%&amp;*?-_</small>
+              </span>
+              <span class="palanca" aria-hidden="true"></span>
+            </span>
+          </label>
+        </div>
+        <p class="nota">Siempre incluye letras minúsculas y mayúsculas.</p>
+
+        <div class="acciones">
+          <button id="generar" class="boton boton-primario" type="submit">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m12 3-1.9 5.8L4 10.6l5 3.6L7.5 20 12 16.6 16.5 20 15 14.2l5-3.6-6.1-1.8z"></path>
+            </svg>
+            Generar contraseña
+          </button>
+          <button id="copiar" class="boton boton-secundario" type="button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="9" y="9" width="12" height="12" rx="2.5"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="texto-copiar">Copiar</span>
+          </button>
+        </div>
+        <p id="estado" role="status"></p>
+      </form>
+
+      <footer>Generada con el módulo <code>secrets</code> de Python. No se guarda nada.</footer>
     </main>
+
     <script>
+      const MIN = 8;
+      const MAX = 64;
+      const ICONO_OJO = '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle>';
+      const ICONO_OJO_TACHADO = '<path d="M10.6 5.1A10.6 10.6 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-2.2 3.1M6.6 6.6C3.7 8.5 2 12 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path><path d="m2 2 20 20"></path>';
+      // La fuerza la calcula la API; aquí solo se elige cómo mostrarla.
+      const FUERZAS = {
+        "débil": { texto: "Débil", color: "var(--debil)", barras: 1 },
+        media: { texto: "Media", color: "var(--media)", barras: 2 },
+        fuerte: { texto: "Fuerte", color: "var(--fuerte)", barras: 3 },
+      };
+
       const formulario = document.querySelector("#formulario");
+      const campoLongitud = document.querySelector("#longitud");
+      const deslizador = document.querySelector("#deslizador");
+      const numeros = document.querySelector("#numeros");
+      const simbolos = document.querySelector("#simbolos");
       const salida = document.querySelector("#contrasena");
       const estado = document.querySelector("#estado");
+      const botonGenerar = document.querySelector("#generar");
+      const botonCopiar = document.querySelector("#copiar");
+      const textoCopiar = document.querySelector("#texto-copiar");
+      const botonVer = document.querySelector("#ver");
+      const iconoVer = document.querySelector("#icono-ver");
+      const botonRegenerar = document.querySelector("#regenerar");
+      const barras = document.querySelectorAll(".barras span");
+      const nivel = document.querySelector("#nivel");
 
-      formulario.addEventListener("submit", async (evento) => {
-        evento.preventDefault();
-        const parametros = new URLSearchParams({
-          longitud: document.querySelector("#longitud").value,
-          numeros: String(document.querySelector("#numeros").checked),
-          simbolos: String(document.querySelector("#simbolos").checked),
+      let visible = true;
+      let temporizadorCopia;
+
+      function mostrarEstado(mensaje, tipo = "") {
+        estado.textContent = mensaje;
+        estado.className = tipo;
+      }
+
+      function actualizarDeslizador() {
+        const valor = Math.min(Math.max(Number(deslizador.value), MIN), MAX);
+        deslizador.style.setProperty("--progreso", `${((valor - MIN) / (MAX - MIN)) * 100}%`);
+      }
+
+      function mostrarFuerza(fuerza) {
+        const datos = FUERZAS[fuerza];
+        barras.forEach((barra, i) => {
+          barra.style.background = datos && i < datos.barras ? datos.color : "";
         });
+        nivel.textContent = `Fuerza: ${datos ? datos.texto : "—"}`;
+        nivel.style.color = datos ? datos.color : "";
+      }
 
-        try {
-          const respuesta = await fetch(`/api/contrasena?${parametros}`);
-          if (!respuesta.ok) {
-            throw new Error("No se pudo generar la contraseña.");
-          }
-          const datos = await respuesta.json();
-          salida.value = datos.contrasena;
-          estado.textContent = "";
-        } catch (error) {
-          estado.textContent = error.message;
-        }
-      });
+      function actualizarVisibilidad() {
+        salida.type = visible ? "text" : "password";
+        iconoVer.innerHTML = visible ? ICONO_OJO_TACHADO : ICONO_OJO;
+        botonVer.setAttribute("aria-label", visible ? "Ocultar contraseña" : "Mostrar contraseña");
+      }
 
-      document.querySelector("#copiar").addEventListener("click", async () => {
-        if (!salida.value) {
-          estado.textContent = "Primero genera una contraseña.";
+      async function generar() {
+        const longitud = Number(campoLongitud.value);
+        if (!Number.isInteger(longitud) || longitud < MIN || longitud > MAX) {
+          mostrarEstado(`La longitud debe ser un número entero entre ${MIN} y ${MAX}.`, "error");
+          campoLongitud.focus();
           return;
         }
 
+        const parametros = new URLSearchParams({
+          longitud: String(longitud),
+          numeros: String(numeros.checked),
+          simbolos: String(simbolos.checked),
+        });
+
+        botonGenerar.setAttribute("aria-busy", "true");
         try {
-          await navigator.clipboard.writeText(salida.value);
-          estado.textContent = "Contraseña copiada.";
+          const respuesta = await fetch(`/api/contrasena?${parametros}`);
+          if (respuesta.status === 422) {
+            throw new Error(`La longitud debe estar entre ${MIN} y ${MAX}.`);
+          }
+          if (!respuesta.ok) {
+            throw new Error("No se pudo generar la contraseña. Intenta de nuevo.");
+          }
+          const datos = await respuesta.json();
+          salida.value = datos.contrasena;
+          mostrarFuerza(datos.fuerza);
+          salida.classList.remove("animar");
+          void salida.offsetWidth;
+          salida.classList.add("animar");
+          mostrarEstado("");
+        } catch (error) {
+          const mensaje = error instanceof TypeError
+            ? "No hay conexión con el servidor."
+            : error.message;
+          mostrarEstado(mensaje, "error");
+        } finally {
+          botonGenerar.removeAttribute("aria-busy");
+        }
+      }
+
+      function copiarConRespaldo(texto) {
+        const area = document.createElement("textarea");
+        area.value = texto;
+        area.setAttribute("readonly", "");
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.appendChild(area);
+        area.select();
+        const exito = document.execCommand("copy");
+        area.remove();
+        if (!exito) throw new Error("copia no disponible");
+      }
+
+      async function copiar() {
+        if (!salida.value) {
+          mostrarEstado("Primero genera una contraseña.", "error");
+          return;
+        }
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(salida.value);
+          } else {
+            copiarConRespaldo(salida.value);
+          }
+          botonCopiar.classList.add("copiado");
+          textoCopiar.textContent = "¡Copiada!";
+          mostrarEstado("Contraseña copiada al portapapeles.", "exito");
+          clearTimeout(temporizadorCopia);
+          temporizadorCopia = setTimeout(() => {
+            botonCopiar.classList.remove("copiado");
+            textoCopiar.textContent = "Copiar";
+            mostrarEstado("");
+          }, 2000);
         } catch {
-          estado.textContent = "No se pudo copiar la contraseña.";
+          mostrarEstado("No se pudo copiar. Selecciona la contraseña y cópiala manualmente.", "error");
+        }
+      }
+
+      deslizador.addEventListener("input", () => {
+        campoLongitud.value = deslizador.value;
+        actualizarDeslizador();
+      });
+      deslizador.addEventListener("change", generar);
+
+      campoLongitud.addEventListener("input", () => {
+        const valor = Number(campoLongitud.value);
+        if (Number.isInteger(valor) && valor >= MIN && valor <= MAX) {
+          deslizador.value = String(valor);
+          actualizarDeslizador();
+          mostrarEstado("");
         }
       });
+      campoLongitud.addEventListener("change", generar);
+
+      [numeros, simbolos].forEach((casilla) => casilla.addEventListener("change", generar));
+
+      formulario.addEventListener("submit", (evento) => {
+        evento.preventDefault();
+        generar();
+      });
+
+      botonCopiar.addEventListener("click", copiar);
+
+      botonVer.addEventListener("click", () => {
+        visible = !visible;
+        actualizarVisibilidad();
+      });
+
+      botonRegenerar.addEventListener("click", () => {
+        botonRegenerar.classList.remove("girar");
+        void botonRegenerar.offsetWidth;
+        botonRegenerar.classList.add("girar");
+        generar();
+      });
+
+      actualizarVisibilidad();
+      actualizarDeslizador();
+      generar();
     </script>
   </body>
 </html>
