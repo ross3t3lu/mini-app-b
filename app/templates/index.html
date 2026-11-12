@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Generador de contraseñas</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, sans-serif;
+        color: #172033;
+        background: #f3f6fb;
+      }
+
+      body {
+        display: grid;
+        min-height: 100vh;
+        margin: 0;
+        place-items: center;
+      }
+
+      main {
+        width: min(90vw, 30rem);
+        padding: 2rem;
+        border-radius: 1rem;
+        background: white;
+        box-shadow: 0 1rem 2.5rem #1720331a;
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+
+      form,
+      .resultado {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .opcion {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      input[type="number"],
+      #contrasena {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0.7rem;
+        border: 1px solid #b8c2d3;
+        border-radius: 0.4rem;
+        font: inherit;
+      }
+
+      button {
+        padding: 0.75rem 1rem;
+        border: 0;
+        border-radius: 0.4rem;
+        background: #2457d6;
+        color: white;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      #copiar {
+        background: #42516b;
+      }
+
+      #estado {
+        min-height: 1.5em;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Generador de contraseñas</h1>
+      <form id="formulario">
+        <label for="longitud">Longitud (8–64)</label>
+        <input id="longitud" name="longitud" type="number" min="8" max="64" value="12" required>
+        <label class="opcion">
+          <input id="numeros" name="numeros" type="checkbox" checked>
+          Incluir números
+        </label>
+        <label class="opcion">
+          <input id="simbolos" name="simbolos" type="checkbox">
+          Incluir símbolos (!@#$%&amp;*?-_)
+        </label>
+        <button type="submit">Generar contraseña</button>
+      </form>
+      <section class="resultado" aria-live="polite">
+        <label for="contrasena">Contraseña generada</label>
+        <input id="contrasena" type="text" readonly>
+        <button id="copiar" type="button">Copiar contraseña</button>
+        <p id="estado" role="status"></p>
+      </section>
+    </main>
+    <script>
+      const formulario = document.querySelector("#formulario");
+      const salida = document.querySelector("#contrasena");
+      const estado = document.querySelector("#estado");
+
+      formulario.addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        const parametros = new URLSearchParams({
+          longitud: document.querySelector("#longitud").value,
+          numeros: String(document.querySelector("#numeros").checked),
+          simbolos: String(document.querySelector("#simbolos").checked),
+        });
+
+        try {
+          const respuesta = await fetch(`/api/contrasena?${parametros}`);
+          if (!respuesta.ok) {
+            throw new Error("No se pudo generar la contraseña.");
+          }
+          const datos = await respuesta.json();
+          salida.value = datos.contrasena;
+          estado.textContent = "";
+        } catch (error) {
+          estado.textContent = error.message;
+        }
+      });
+
+      document.querySelector("#copiar").addEventListener("click", async () => {
+        if (!salida.value) {
+          estado.textContent = "Primero genera una contraseña.";
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(salida.value);
+          estado.textContent = "Contraseña copiada.";
+        } catch {
+          estado.textContent = "No se pudo copiar la contraseña.";
+        }
+      });
+    </script>
+  </body>
+</html>
